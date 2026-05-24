@@ -66,18 +66,25 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "نُخبة — تعلّم علوم الحديث للأطفال" },
+      { title: "حديث" },
       {
         name: "description",
         content:
           "منصّة تعليمية تفاعلية لتعليم علوم الحديث الشريف للأطفال بأسلوب حديث ومبسّط، مستوحاة من خان أكاديمي.",
       },
-      { property: "og:title", content: "نُخبة — تعلّم علوم الحديث" },
+      { property: "og:title", content: "حديث" },
       {
         property: "og:description",
         content: "دروس قصيرة، تمارين تفاعلية، ونظام إتقان للأطفال.",
       },
       { property: "og:type", content: "website" },
+      { name: "twitter:title", content: "حديث" },
+      { name: "description", content: "Nur Academy is an Arabic Islamic educational platform for children, offering structured, interactive learning in Islamic sciences." },
+      { property: "og:description", content: "Nur Academy is an Arabic Islamic educational platform for children, offering structured, interactive learning in Islamic sciences." },
+      { name: "twitter:description", content: "Nur Academy is an Arabic Islamic educational platform for children, offering structured, interactive learning in Islamic sciences." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b00d1814-578a-4a17-ad1e-abee5506189a/id-preview-b1291dc3--fde7e354-c643-4fe5-bf71-33c0f8fb7b5e.lovable.app-1779661825044.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/b00d1814-578a-4a17-ad1e-abee5506189a/id-preview-b1291dc3--fde7e354-c643-4fe5-bf71-33c0f8fb7b5e.lovable.app-1779661825044.png" },
+      { name: "twitter:card", content: "summary_large_image" },
     ],
     links: [
       { rel: "stylesheet", href: appCss },
