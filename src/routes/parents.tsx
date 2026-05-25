@@ -51,9 +51,7 @@ function ParentsDashboard() {
     .sort((a, b) => a.score - b.score)
     .slice(0, 6);
 
-  // Time spent (estimate based on lesson minutes for completed lessons)
-  const minutesSpent = attempted.reduce((sum, l) => sum + l.lesson_minutes_safe(), 0);
-  // helper above doesn't exist; compute inline:
+  // Estimated time spent (sum of minutes across attempted lessons)
   const totalMinutes = attempted.reduce((sum, l) => sum + l.minutes, 0);
 
   // Suggested 7-day review schedule
