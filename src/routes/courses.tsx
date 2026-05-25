@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { levels } from "@/lib/curriculum";
+import { useEffect, useState } from "react";
+import { levels as baseLevels } from "@/lib/curriculum";
+import { getMergedLevels } from "@/lib/admin-store";
 import { LessonNode } from "@/components/LessonNode";
 import { useProgress } from "@/hooks/use-progress";
 import { isUnlocked } from "@/lib/progress";
@@ -19,6 +21,13 @@ export const Route = createFileRoute("/courses")({
 
 function CoursesPage() {
   const p = useProgress();
+  const [levels, setLevels] = useState(baseLevels);
+  useEffect(() => {
+    const update = () => setLevels(getMergedLevels());
+    update();
+    window.addEventListener("nuhba:admin", update);
+    return () => window.removeEventListener("nuhba:admin", update);
+  }, []);
 
   return (
     <div className="mx-auto max-w-3xl px-4 py-10 sm:py-14">
