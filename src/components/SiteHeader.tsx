@@ -26,6 +26,7 @@ export function SiteHeader() {
             { to: "/courses", label: "المسار" },
             { to: "/dashboard", label: "لوحتي" },
             { to: "/parents", label: "الوالدين" },
+            { to: "/admin", label: "الإدارة" },
           ].map((l) => (
             <Link
               key={l.to}
@@ -41,11 +42,11 @@ export function SiteHeader() {
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-1.5 rounded-full bg-gold/15 px-3 py-1.5 text-xs font-semibold text-gold-foreground">
             <Sparkles className="h-3.5 w-3.5" style={{ color: "var(--color-gold)" }} />
-            <span>{p.xp} XP</span>
+            <span suppressHydrationWarning>{mounted ? p.xp : 0} XP</span>
           </div>
           <div className="hidden sm:flex items-center gap-1.5 rounded-full bg-primary-soft px-3 py-1.5 text-xs font-semibold text-primary">
             <Flame className="h-3.5 w-3.5" />
-            <span>{p.streak} يوم</span>
+            <span suppressHydrationWarning>{mounted ? p.streak : 0} يوم</span>
           </div>
         </div>
       </div>
