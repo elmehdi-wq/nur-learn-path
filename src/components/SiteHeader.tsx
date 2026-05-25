@@ -22,6 +22,7 @@ export function SiteHeader() {
             { to: "/", label: "الرئيسية" },
             { to: "/courses", label: "المسار" },
             { to: "/dashboard", label: "لوحتي" },
+            { to: "/parents", label: "الوالدين" },
           ].map((l) => (
             <Link
               key={l.to}
