@@ -284,7 +284,6 @@ function ParentsDashboard() {
 
       <p className="mt-8 text-center text-xs text-muted-foreground">
         الوقت التقديري المستثمَر في التعلّم: {totalMinutes} دقيقة
-        {minutesSpent ? "" : ""}
       </p>
     </div>
   );
