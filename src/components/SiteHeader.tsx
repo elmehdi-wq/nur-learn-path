@@ -1,9 +1,12 @@
 import { Link } from "@tanstack/react-router";
+import { useEffect, useState } from "react";
 import { useProgress } from "@/hooks/use-progress";
 import { Flame, Sparkles } from "lucide-react";
 
 export function SiteHeader() {
   const p = useProgress();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
   return (
     <header className="sticky top-0 z-40 border-b border-border/60 bg-background/80 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-6xl items-center justify-between gap-4 px-4">
