@@ -1,6 +1,11 @@
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { allLessons, findLesson, findLevelOfLesson, findUnit } from "@/lib/curriculum";
+import {
+  applyOverride,
+  findMergedLesson,
+  getMergedLessonsFlat,
+} from "@/lib/admin-store";
 import { completeLesson, isUnlocked } from "@/lib/progress";
 import { Quiz } from "@/components/Quiz";
 import { ArrowLeft, BookOpen, CheckCircle2, Play, Sparkles } from "lucide-react";
@@ -23,7 +28,14 @@ type Phase = "intro" | "quiz" | "done";
 function LessonPage() {
   const { lessonId } = Route.useParams();
   const navigate = useNavigate();
-  const lesson = findLesson(lessonId);
+  const baseLesson = findLesson(lessonId);
+  const [lesson, setLesson] = useState(baseLesson);
+  useEffect(() => {
+    // On client, prefer merged lesson (with custom content + overrides)
+    const merged = findMergedLesson(lessonId);
+    if (merged) setLesson(applyOverride(merged));
+    else if (baseLesson) setLesson(applyOverride(baseLesson));
+  }, [lessonId, baseLesson]);
   const [phase, setPhase] = useState<Phase>("intro");
   const [score, setScore] = useState(0);
 
@@ -52,8 +64,10 @@ function LessonPage() {
 
   const unit = findUnit(lesson.unitId);
   const level = findLevelOfLesson(lesson.id);
-  const idx = allLessons.findIndex((l) => l.id === lesson.id);
-  const next = allLessons[idx + 1];
+  const mergedFlat = getMergedLessonsFlat();
+  const flat = mergedFlat.length ? mergedFlat : allLessons;
+  const idx = flat.findIndex((l) => l.id === lesson.id);
+  const next = flat[idx + 1];
 
   const handleDone = (s: number) => {
     setScore(s);
