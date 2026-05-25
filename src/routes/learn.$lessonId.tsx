@@ -98,17 +98,28 @@ function LessonPage() {
             <p className="mt-2 text-muted-foreground text-lg">{lesson.summary}</p>
           </div>
 
-          {/* "video" placeholder block */}
-          <div className="relative aspect-video overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/15 via-accent/30 to-gold/15 shadow-card">
-            <div className="absolute inset-0 bg-arabesque opacity-30" />
-            <div className="relative flex h-full flex-col items-center justify-center gap-3 text-center px-6">
-              <div className="grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground shadow-glow">
-                <Play className="h-6 w-6 ms-1" />
-              </div>
-              <p className="text-sm text-muted-foreground">فيديو الدرس ({lesson.minutes} دقائق)</p>
-              <p className="text-xs text-muted-foreground/80">سيتم ربطه بالفيديو الفعلي قريباً</p>
+          {lesson.videoEmbed ? (
+            <div className="relative aspect-video overflow-hidden rounded-3xl border bg-black shadow-card">
+              <iframe
+                src={lesson.videoEmbed}
+                title={lesson.title}
+                className="absolute inset-0 h-full w-full"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                allowFullScreen
+              />
             </div>
-          </div>
+          ) : (
+            <div className="relative aspect-video overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/15 via-accent/30 to-gold/15 shadow-card">
+              <div className="absolute inset-0 bg-arabesque opacity-30" />
+              <div className="relative flex h-full flex-col items-center justify-center gap-3 text-center px-6">
+                <div className="grid h-16 w-16 place-items-center rounded-full bg-primary text-primary-foreground shadow-glow">
+                  <Play className="h-6 w-6 ms-1" />
+                </div>
+                <p className="text-sm text-muted-foreground">فيديو الدرس ({lesson.minutes} دقائق)</p>
+                <p className="text-xs text-muted-foreground/80">أضف رابط الفيديو من لوحة الإدارة</p>
+              </div>
+            </div>
+          )}
 
           <div className="rounded-3xl border bg-card p-6 shadow-card">
             <div className="mb-4 flex items-center gap-2">
