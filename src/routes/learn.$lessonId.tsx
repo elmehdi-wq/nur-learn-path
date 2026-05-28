@@ -101,13 +101,23 @@ function LessonPage() {
 
           {lesson.videoEmbed ? (
             <div className="relative aspect-video overflow-hidden rounded-3xl border bg-black shadow-card">
-              <iframe
-                src={lesson.videoEmbed}
-                title={lesson.title}
-                className="absolute inset-0 h-full w-full"
-                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                allowFullScreen
-              />
+              {isFileVideo(lesson.videoEmbed) ? (
+                <video
+                  src={lesson.videoEmbed}
+                  title={lesson.title}
+                  controls
+                  playsInline
+                  className="absolute inset-0 h-full w-full"
+                />
+              ) : (
+                <iframe
+                  src={lesson.videoEmbed}
+                  title={lesson.title}
+                  className="absolute inset-0 h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                />
+              )}
             </div>
           ) : (
             <div className="relative aspect-video overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/15 via-accent/30 to-gold/15 shadow-card">
