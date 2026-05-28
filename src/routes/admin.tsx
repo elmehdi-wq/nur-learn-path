@@ -12,6 +12,7 @@ import {
 } from "@/lib/admin-store";
 import { loadProgress } from "@/lib/progress";
 import type { Exercise, Lesson, Unit } from "@/lib/curriculum";
+import { VideoInput } from "@/components/VideoInput";
 import {
   BookPlus,
   FolderPlus,
