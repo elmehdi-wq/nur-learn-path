@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   applyOverride,
@@ -8,18 +8,26 @@ import {
   saveStudent,
   uid,
   useAdmin,
-  type AdminState,
 } from "@/lib/admin-store";
 import { loadProgress } from "@/lib/progress";
 import type { Exercise, Lesson, Unit } from "@/lib/curriculum";
+import { buildSchedule, getWeakSkills, WEEKDAYS_AR } from "@/lib/schedule";
 import { VideoInput } from "@/components/VideoInput";
 import {
+  AlertTriangle,
   BookPlus,
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  Flame,
   FolderPlus,
   GraduationCap,
   Layers,
   PlayCircle,
   Plus,
+  RotateCcw,
+  Sparkles,
+  Target,
   Trash2,
   Users,
   Video,
