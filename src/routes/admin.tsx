@@ -435,13 +435,10 @@ function LessonEditor({
         />
       </Field>
 
-      <Field label="رابط الفيديو (اختياري)">
-        <input
-          value={l.videoEmbed ?? ""}
-          onChange={(e) => setL({ ...l, videoEmbed: e.target.value })}
-          placeholder="https://www.youtube.com/embed/..."
-          className="w-full rounded-lg border bg-background px-3 py-2 text-sm ltr text-left"
-          dir="ltr"
+      <Field label="فيديو الدرس (رابط أو ملف)">
+        <VideoInput
+          value={l.videoEmbed}
+          onChange={(v) => setL({ ...l, videoEmbed: v })}
         />
       </Field>
 
