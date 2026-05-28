@@ -7,6 +7,7 @@ import {
   getMergedLessonsFlat,
 } from "@/lib/admin-store";
 import { completeLesson, isUnlocked } from "@/lib/progress";
+import { isFileVideo } from "@/lib/video";
 import { Quiz } from "@/components/Quiz";
 import { ArrowLeft, BookOpen, CheckCircle2, Play, Sparkles } from "lucide-react";
 
