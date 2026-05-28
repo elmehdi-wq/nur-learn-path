@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useProgress } from "@/hooks/use-progress";
 import { allLessons, levels, findUnit } from "@/lib/curriculum";
 import { masteryPercent } from "@/lib/progress";
+import { buildSchedule, getWeakSkills, WEEKDAYS_AR } from "@/lib/schedule";
 import {
   Users,
   TrendingUp,
