@@ -647,23 +647,18 @@ function VideosTab() {
   return (
     <div className="space-y-3">
       <p className="text-sm text-muted-foreground">
-        ألصق رابط تضمين الفيديو (YouTube embed أو رابط mp4) لكل درس.
+        اربط فيديو لكل درس: ألصق رابط YouTube/Vimeo أو ارفع ملف mp4/webm. يتم
+        التحقّق من الصيغة تلقائيًا.
       </p>
       {allLessons.map((l) => {
-        const current = applyOverride(l, state).videoEmbed ?? "";
+        const current = applyOverride(l, state).videoEmbed;
         return (
           <div key={l.id} className="rounded-xl border bg-card p-4">
             <div className="mb-2 flex items-center gap-2">
               <PlayCircle className="h-4 w-4 text-primary" />
               <span className="font-bold">{l.title}</span>
             </div>
-            <input
-              defaultValue={current}
-              onBlur={(e) => setVideo(l.id, e.target.value)}
-              placeholder="https://www.youtube.com/embed/..."
-              dir="ltr"
-              className="w-full rounded-lg border bg-background px-3 py-2 text-sm ltr text-left"
-            />
+            <VideoInput value={current} onChange={(v) => setVideo(l.id, v ?? "")} />
           </div>
         );
       })}
