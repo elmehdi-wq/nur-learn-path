@@ -2,6 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { useProgress } from "@/hooks/use-progress";
 import { allLessons, levels, findUnit } from "@/lib/curriculum";
 import { masteryPercent } from "@/lib/progress";
+import { buildSchedule, getWeakSkills, WEEKDAYS_AR } from "@/lib/schedule";
 import {
   Users,
   TrendingUp,
@@ -35,7 +36,7 @@ export const Route = createFileRoute("/parents")({
   }),
 });
 
-const WEEKDAYS_AR = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+
 
 function ParentsDashboard() {
   const p = useProgress();
@@ -289,39 +290,6 @@ function ParentsDashboard() {
   );
 }
 
-function buildSchedule(
-  p: ReturnType<typeof useProgress>,
-  today: Date
-): Array<{ dow: number; minutes: number; lesson: (typeof allLessons)[number] | null; kind: string }> {
-  // Build review queue: weak first, then next un-mastered
-  const weak = allLessons
-    .filter((l) => p.completed[l.id] && p.completed[l.id].score < 85)
-    .sort((a, b) => p.completed[a.id].score - p.completed[b.id].score);
-  const upcoming = allLessons.filter(
-    (l) => !p.completed[l.id] || p.completed[l.id].score < 70
-  );
-
-  const queue: Array<{ lesson: (typeof allLessons)[number]; kind: string }> = [];
-  weak.forEach((l) => queue.push({ lesson: l, kind: "مراجعة" }));
-  upcoming.forEach((l) => {
-    if (!queue.find((q) => q.lesson.id === l.id)) queue.push({ lesson: l, kind: "درس جديد" });
-  });
-
-  return Array.from({ length: 7 }, (_, i) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() + i);
-    const dow = d.getDay();
-    const isFriday = dow === 5;
-    if (isFriday) return { dow, minutes: 0, lesson: null, kind: "راحة" };
-    const item = queue.shift();
-    return {
-      dow,
-      minutes: item ? item.lesson.minutes + 5 : 10,
-      lesson: item?.lesson ?? null,
-      kind: item?.kind ?? "مراجعة حرة",
-    };
-  });
-}
 
 function Kpi({
   icon,

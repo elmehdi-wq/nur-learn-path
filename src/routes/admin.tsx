@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import {
   applyOverride,
@@ -8,18 +8,26 @@ import {
   saveStudent,
   uid,
   useAdmin,
-  type AdminState,
 } from "@/lib/admin-store";
 import { loadProgress } from "@/lib/progress";
 import type { Exercise, Lesson, Unit } from "@/lib/curriculum";
+import { buildSchedule, getWeakSkills, WEEKDAYS_AR } from "@/lib/schedule";
 import { VideoInput } from "@/components/VideoInput";
 import {
+  AlertTriangle,
   BookPlus,
+  CalendarDays,
+  CheckCircle2,
+  Clock,
+  Flame,
   FolderPlus,
   GraduationCap,
   Layers,
   PlayCircle,
   Plus,
+  RotateCcw,
+  Sparkles,
+  Target,
   Trash2,
   Users,
   Video,
@@ -476,10 +484,7 @@ function LessonEditor({
       <div>
         <div className="mb-2 flex items-center justify-between">
           <label className="text-xs font-bold">الأسئلة ({l.exercises.length})</label>
-          <button
-            onClick={addExercise}
-            className="text-xs font-bold text-primary"
-          >
+          <button onClick={addExercise} className="text-xs font-bold text-primary">
             + سؤال
           </button>
         </div>
@@ -505,10 +510,7 @@ function LessonEditor({
         <button
           onClick={() => {
             if (!l.title.trim()) return alert("أدخل عنوان الدرس.");
-            onSave({
-              ...l,
-              keyPoints: l.keyPoints.filter((k) => k.trim()),
-            });
+            onSave({ ...l, keyPoints: l.keyPoints.filter((k) => k.trim()) });
           }}
           className="rounded-lg bg-primary px-4 py-2 text-sm font-bold text-primary-foreground"
         >
@@ -596,9 +598,7 @@ function ExerciseEditor({
       ))}
       {ex.type === "mcq" && (
         <button
-          onClick={() =>
-            onChange({ ...ex, options: [...(ex.options ?? []), ""] })
-          }
+          onClick={() => onChange({ ...ex, options: [...(ex.options ?? []), ""] })}
           className="text-xs font-bold text-primary"
         >
           + خيار
@@ -693,24 +693,41 @@ function StudentsTab() {
   const completed = Object.entries(progress.completed);
   const masteryCount = completed.filter(([, c]) => c.score >= 70).length;
   const avgScore = completed.length
-    ? Math.round(
-        completed.reduce((s, [, c]) => s + c.score, 0) / completed.length,
-      )
+    ? Math.round(completed.reduce((s, [, c]) => s + c.score, 0) / completed.length)
     : 0;
+  const masteryPct = all.length ? Math.round((masteryCount / all.length) * 100) : 0;
+  const weak = getWeakSkills(progress);
+  const schedule = buildSchedule(progress);
+
+  const doReset = () => {
+    if (confirm("تصفير تقدّم الطالب بالكامل؟ لا يمكن التراجع.")) {
+      resetStudentProgress();
+      setProgress(loadProgress());
+    }
+  };
 
   return (
     <div className="space-y-6">
+      {/* Profile + KPIs */}
       <div className="rounded-2xl border bg-card p-5 shadow-card">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-foreground">
-            <GraduationCap className="h-6 w-6" />
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+          <div className="flex items-center gap-3">
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary text-primary-foreground">
+              <GraduationCap className="h-6 w-6" />
+            </div>
+            <div>
+              <h3 className="font-bold">{student.name || "طالب"}</h3>
+              <p className="text-xs text-muted-foreground">
+                منذ {new Date(student.createdAt).toLocaleDateString("ar")}
+              </p>
+            </div>
           </div>
-          <div className="flex-1">
-            <h3 className="font-bold">الملف الشخصي للطالب</h3>
-            <p className="text-xs text-muted-foreground">
-              منذ {new Date(student.createdAt).toLocaleDateString("ar")}
-            </p>
-          </div>
+          <button
+            onClick={doReset}
+            className="inline-flex items-center gap-1.5 rounded-lg border border-destructive/30 px-3 py-2 text-xs font-bold text-destructive hover:bg-destructive/10"
+          >
+            <RotateCcw className="h-3.5 w-3.5" /> تصفير التقدّم
+          </button>
         </div>
 
         <div className="grid gap-3 sm:grid-cols-2">
@@ -742,62 +759,171 @@ function StudentsTab() {
           </Field>
         </div>
 
-        <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+        <div className="mt-5 grid grid-cols-2 sm:grid-cols-4 gap-3 text-center">
+          <Stat label="نسبة الإتقان" value={`${masteryPct}%`} />
           <Stat label="XP" value={progress.xp} />
           <Stat label="السلسلة" value={`${progress.streak} يوم`} />
-          <Stat label="دروس متقَنة" value={`${masteryCount}/${all.length}`} />
-          <Stat label="متوسط الدرجات" value={`${avgScore}%`} />
+          <Stat label="متوسّط الدرجات" value={`${avgScore}%`} />
         </div>
 
-        <button
-          onClick={() => {
-            if (confirm("تصفير تقدّم الطالب بالكامل؟")) {
-              resetStudentProgress();
-              setProgress(loadProgress());
-            }
-          }}
-          className="mt-4 rounded-lg border border-destructive/30 px-4 py-2 text-xs font-bold text-destructive hover:bg-destructive/10"
-        >
-          تصفير التقدّم
-        </button>
+        <div className="mt-4">
+          <div className="mb-1 flex justify-between text-xs text-muted-foreground">
+            <span>التقدّم الإجمالي</span>
+            <span>
+              {masteryCount} / {all.length} درس
+            </span>
+          </div>
+          <div className="h-2 overflow-hidden rounded-full bg-muted">
+            <div
+              className="h-full rounded-full bg-gradient-to-l from-primary to-accent transition-all"
+              style={{ width: `${masteryPct}%` }}
+            />
+          </div>
+        </div>
       </div>
 
-      <div className="rounded-2xl border bg-card p-5 shadow-card">
-        <h3 className="font-bold mb-3">سجلّ الدروس</h3>
-        {completed.length === 0 ? (
-          <p className="text-sm text-muted-foreground">لم يكمل الطالب أي درس بعد.</p>
-        ) : (
-          <div className="space-y-2">
-            {completed
-              .sort((a, b) => b[1].at - a[1].at)
-              .map(([id, c]) => {
-                const l = all.find((x) => x.id === id);
-                const ok = c.score >= 70;
+      {/* Weak skills + Schedule */}
+      <div className="grid gap-6 lg:grid-cols-3">
+        <section className="lg:col-span-2 rounded-2xl border bg-card p-5 shadow-card">
+          <div className="flex items-center gap-2">
+            <AlertTriangle className="h-5 w-5 text-destructive" />
+            <h3 className="font-bold">المهارات الضعيفة</h3>
+          </div>
+          <p className="mt-1 text-xs text-muted-foreground">
+            الدروس التي لم تتجاوز ٨٥٪، مرتّبة من الأضعف.
+          </p>
+
+          {weak.length === 0 ? (
+            <div className="mt-4 flex items-center gap-2 rounded-xl border border-primary/30 bg-primary-soft p-3 text-sm font-medium text-primary">
+              <CheckCircle2 className="h-4 w-4" />
+              لا توجد مهارات ضعيفة 👏
+            </div>
+          ) : (
+            <ul className="mt-4 space-y-2">
+              {weak.map(({ lesson, score }) => {
+                const tone =
+                  score < 50
+                    ? "bg-destructive/10 text-destructive"
+                    : score < 70
+                      ? "bg-gold/15 text-gold-foreground"
+                      : "bg-accent/40 text-foreground";
                 return (
-                  <div
-                    key={id}
-                    className="flex items-center justify-between rounded-lg border bg-background px-3 py-2 text-sm"
-                  >
-                    <span className="font-semibold">{l?.title ?? id}</span>
-                    <div className="flex items-center gap-3">
+                  <li key={lesson.id}>
+                    <Link
+                      to="/learn/$lessonId"
+                      params={{ lessonId: lesson.id }}
+                      className="flex items-center gap-3 rounded-xl border bg-background p-3 hover:border-primary hover:shadow-soft"
+                    >
                       <span
-                        className={`rounded-full px-2 py-0.5 text-xs font-bold ${
-                          ok
-                            ? "bg-success/15 text-success"
-                            : "bg-destructive/15 text-destructive"
-                        }`}
+                        className={`grid h-10 w-10 shrink-0 place-items-center rounded-lg text-xs font-extrabold ${tone}`}
                       >
-                        {c.score}%
+                        {score}%
                       </span>
-                      <span className="text-xs text-muted-foreground">
-                        {new Date(c.at).toLocaleDateString("ar")}
+                      <span className="flex-1 text-sm font-semibold truncate">
+                        {lesson.title}
                       </span>
-                    </div>
-                  </div>
+                      <span className="text-[11px] font-bold text-primary">مراجعة</span>
+                    </Link>
+                  </li>
                 );
               })}
+            </ul>
+          )}
+
+          <div className="mt-6">
+            <h4 className="text-sm font-bold mb-2">سجلّ الدروس ({completed.length})</h4>
+            {completed.length === 0 ? (
+              <p className="text-sm text-muted-foreground">لم يكمل الطالب أي درس بعد.</p>
+            ) : (
+              <div className="space-y-2 max-h-72 overflow-auto pe-1">
+                {completed
+                  .sort((a, b) => b[1].at - a[1].at)
+                  .map(([id, c]) => {
+                    const l = all.find((x) => x.id === id);
+                    const ok = c.score >= 70;
+                    return (
+                      <div
+                        key={id}
+                        className="flex items-center justify-between rounded-lg border bg-background px-3 py-2 text-sm"
+                      >
+                        <span className="font-semibold truncate">{l?.title ?? id}</span>
+                        <div className="flex items-center gap-3 shrink-0">
+                          <span
+                            className={`rounded-full px-2 py-0.5 text-xs font-bold ${
+                              ok
+                                ? "bg-success/15 text-success"
+                                : "bg-destructive/15 text-destructive"
+                            }`}
+                          >
+                            {c.score}%
+                          </span>
+                          <span className="text-xs text-muted-foreground">
+                            {new Date(c.at).toLocaleDateString("ar")}
+                          </span>
+                        </div>
+                      </div>
+                    );
+                  })}
+              </div>
+            )}
           </div>
-        )}
+        </section>
+
+        <aside className="rounded-2xl border bg-card p-5 shadow-card">
+          <div className="flex items-center gap-2">
+            <CalendarDays className="h-5 w-5 text-primary" />
+            <h3 className="font-bold">جدول المراجعة (٧ أيام)</h3>
+          </div>
+          <p className="mt-1 text-[11px] text-muted-foreground">
+            خطّة مقترحة بناءً على نقاط الضعف والدروس القادمة.
+          </p>
+
+          <ol className="mt-3 space-y-2">
+            {schedule.map((day, i) => (
+              <li
+                key={i}
+                className={`rounded-xl border p-2.5 ${
+                  i === 0 ? "border-primary/40 bg-primary-soft" : "bg-background"
+                }`}
+              >
+                <div className="flex items-center justify-between text-[11px]">
+                  <span className="font-bold">
+                    {i === 0 ? "اليوم" : WEEKDAYS_AR[day.dow]}
+                  </span>
+                  <span className="flex items-center gap-1 text-muted-foreground">
+                    <Clock className="h-3 w-3" /> {day.minutes} د
+                  </span>
+                </div>
+                {day.lesson ? (
+                  <Link
+                    to="/learn/$lessonId"
+                    params={{ lessonId: day.lesson.id }}
+                    className="mt-1 block"
+                  >
+                    <p className="text-[10px] text-muted-foreground">{day.kind}</p>
+                    <p className="text-xs font-semibold leading-tight hover:text-primary">
+                      {day.lesson.title}
+                    </p>
+                  </Link>
+                ) : (
+                  <p className="mt-1 text-[11px] text-muted-foreground">يوم راحة 🌟</p>
+                )}
+              </li>
+            ))}
+          </ol>
+
+          <div className="mt-4 flex flex-wrap gap-3 text-[11px] text-muted-foreground">
+            <span className="inline-flex items-center gap-1">
+              <Target className="h-3 w-3 text-primary" /> {masteryPct}%
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Flame className="h-3 w-3 text-destructive" /> {progress.streak}
+            </span>
+            <span className="inline-flex items-center gap-1">
+              <Sparkles className="h-3 w-3 text-gold" /> {progress.xp} XP
+            </span>
+          </div>
+        </aside>
       </div>
     </div>
   );
