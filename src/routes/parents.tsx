@@ -36,7 +36,7 @@ export const Route = createFileRoute("/parents")({
   }),
 });
 
-const WEEKDAYS_AR = ["الأحد", "الإثنين", "الثلاثاء", "الأربعاء", "الخميس", "الجمعة", "السبت"];
+
 
 function ParentsDashboard() {
   const p = useProgress();
