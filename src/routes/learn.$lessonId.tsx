@@ -119,7 +119,7 @@ function LessonPage() {
                 />
               )}
             </div>
-          ) : (
+          ) : lesson.kind === "video" ? (
             <div className="relative aspect-video overflow-hidden rounded-3xl border bg-gradient-to-br from-primary/15 via-accent/30 to-gold/15 shadow-card">
               <div className="absolute inset-0 bg-arabesque opacity-30" />
               <div className="relative flex h-full flex-col items-center justify-center gap-3 text-center px-6">
@@ -130,30 +130,46 @@ function LessonPage() {
                 <p className="text-xs text-muted-foreground/80">أضف رابط الفيديو من لوحة الإدارة</p>
               </div>
             </div>
+          ) : null}
+
+          {lesson.keyPoints.length > 0 && (
+            <div className="rounded-3xl border bg-card p-6 shadow-card">
+              <div className="mb-4 flex items-center gap-2">
+                <BookOpen className="h-5 w-5 text-primary" />
+                <h2 className="font-bold text-lg">النقاط الرئيسية</h2>
+              </div>
+              <ul className="space-y-3">
+                {lesson.keyPoints.map((k, i) => (
+                  <li key={i} className="flex gap-3">
+                    <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary-soft text-primary text-xs font-bold">
+                      {i + 1}
+                    </span>
+                    <span className="text-sm sm:text-base leading-relaxed">{k}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
           )}
 
-          <div className="rounded-3xl border bg-card p-6 shadow-card">
-            <div className="mb-4 flex items-center gap-2">
-              <BookOpen className="h-5 w-5 text-primary" />
-              <h2 className="font-bold text-lg">النقاط الرئيسية</h2>
+          {(lesson.kind === "unit-exam" || lesson.kind === "level-exam") && (
+            <div className="rounded-3xl border-2 border-gold/40 bg-gold/10 p-6 text-center">
+              <p className="text-sm font-bold text-gold-foreground">
+                {lesson.kind === "level-exam"
+                  ? "هذا اختبار المستوى — يلخّص كل ما درست في هذا المستوى."
+                  : "هذا اختبار الوحدة — تأكّد من مراجعة الدروس قبل البدء."}
+              </p>
             </div>
-            <ul className="space-y-3">
-              {lesson.keyPoints.map((k, i) => (
-                <li key={i} className="flex gap-3">
-                  <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-primary-soft text-primary text-xs font-bold">
-                    {i + 1}
-                  </span>
-                  <span className="text-sm sm:text-base leading-relaxed">{k}</span>
-                </li>
-              ))}
-            </ul>
-          </div>
+          )}
 
           <button
             onClick={() => setPhase("quiz")}
             className="w-full rounded-2xl bg-primary px-6 py-4 text-base font-bold text-primary-foreground shadow-soft transition-all hover:shadow-glow"
           >
-            ابدأ التمارين ←
+            {lesson.kind === "unit-exam" || lesson.kind === "level-exam"
+              ? "ابدأ الاختبار ←"
+              : lesson.kind === "section-quiz"
+              ? "ابدأ اختبار القسم ←"
+              : "ابدأ التمارين ←"}
           </button>
         </div>
       )}
